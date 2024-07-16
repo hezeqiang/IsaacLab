@@ -3,6 +3,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# cd C:/Users/13306/OneDrive/Coding_Proj/IsaacLab
+# mklink /D _isaac_sim C:\isaacsim\lib\isaac-sim-4.0.0
+
 """This script demonstrates how to create a simple stage in Isaac Sim.
 
 .. code-block:: bash

@@ -43,6 +43,7 @@ def design_scene():
     cfg_ground = sim_utils.GroundPlaneCfg()
     cfg_ground.func("/World/defaultGroundPlane", cfg_ground)
 
+
     # spawn distant light
     cfg_light_distant = sim_utils.DistantLightCfg(
         intensity=3000.0,
@@ -50,8 +51,11 @@ def design_scene():
     )
     cfg_light_distant.func("/World/lightDistant", cfg_light_distant, translation=(1, 0, 10))
 
+
     # create a new xform prim for all objects to be spawned under
     prim_utils.create_prim("/World/Objects", "Xform")
+
+
     # spawn a red cone
     cfg_cone = sim_utils.ConeCfg(
         radius=0.15,
@@ -60,6 +64,7 @@ def design_scene():
     )
     cfg_cone.func("/World/Objects/Cone1", cfg_cone, translation=(-1.0, 1.0, 1.0))
     cfg_cone.func("/World/Objects/Cone2", cfg_cone, translation=(-1.0, -1.0, 1.0))
+
 
     # spawn a green cone with colliders and rigid body
     cfg_cone_rigid = sim_utils.ConeCfg(
@@ -74,6 +79,7 @@ def design_scene():
         "/World/Objects/ConeRigid", cfg_cone_rigid, translation=(0.0, 0.0, 2.0), orientation=(0.5, 0.0, 0.5, 0.0)
     )
 
+
     # spawn a blue cuboid with deformable body
     cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
         size=(0.2, 0.5, 0.2),
@@ -82,6 +88,7 @@ def design_scene():
         physics_material=sim_utils.DeformableBodyMaterialCfg(),
     )
     cfg_cuboid_deformable.func("/World/Objects/CuboidDeformable", cfg_cuboid_deformable, translation=(0.15, 0.0, 2.0))
+
 
     # spawn a usd file of a table into the scene
     cfg = sim_utils.UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd")

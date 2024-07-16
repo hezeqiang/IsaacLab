@@ -31,10 +31,15 @@ parser.add_argument(
     "--height", type=int, default=720, help="Height of the viewport and generated images. Defaults to 720"
 )
 
+print("***********************************************************",parser)
+
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
+
+print("***********************************************************",args_cli)
+
 # launch omniverse app
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
@@ -50,12 +55,16 @@ def design_scene():
     cfg_ground = sim_utils.GroundPlaneCfg()
     cfg_ground.func("/World/defaultGroundPlane", cfg_ground)
 
+
+
     # spawn distant light
     cfg_light_distant = sim_utils.DistantLightCfg(
         intensity=3000.0,
         color=(0.75, 0.75, 0.75),
     )
     cfg_light_distant.func("/World/lightDistant", cfg_light_distant, translation=(1, 0, 10))
+
+
 
     # spawn a cuboid
     cfg_cuboid = sim_utils.CuboidCfg(
@@ -64,6 +73,8 @@ def design_scene():
     )
     # Spawn cuboid, altering translation on the z-axis to scale to its size
     cfg_cuboid.func("/World/Object", cfg_cuboid, translation=(0.0, 0.0, args_cli.size / 2))
+
+
 
 
 def main():

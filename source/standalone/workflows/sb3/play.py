@@ -7,6 +7,9 @@
 
 """Launch Isaac Sim Simulator first."""
 
+#python source/standalone/workflows/sb3/train.py --task Isaac-Cartpole-v0
+#python  source/standalone/workflows/sb3/play.py --task Isaac-Cartpole-v0 --num_envs 32 --checkpoint logs/sb3/isaac-Cartpole-v0/2024-07-16_19-08-46/model.zip
+
 import argparse
 
 from omni.isaac.lab.app import AppLauncher

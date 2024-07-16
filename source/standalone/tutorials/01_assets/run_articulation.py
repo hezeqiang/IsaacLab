@@ -51,9 +51,12 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     # Ground-plane
     cfg = sim_utils.GroundPlaneCfg()
     cfg.func("/World/defaultGroundPlane", cfg)
+
+
     # Lights
     cfg = sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
     cfg.func("/World/Light", cfg)
+    
 
     # Create separate groups called "Origin1", "Origin2", "Origin3"
     # Each group will have a robot in it
