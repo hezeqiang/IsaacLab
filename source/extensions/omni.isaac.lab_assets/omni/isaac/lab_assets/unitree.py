@@ -51,6 +51,7 @@ This model is taken from: https://github.com/Improbable-AI/walk-these-ways
 
 
 UNITREE_A1_CFG = ArticulationCfg(
+
     spawn=sim_utils.UsdFileCfg(
         usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Robots/Unitree/A1/a1.usd",
         activate_contact_sensors=True,
@@ -67,6 +68,7 @@ UNITREE_A1_CFG = ArticulationCfg(
             enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=0
         ),
     ),
+
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.42),
         joint_pos={
@@ -78,7 +80,9 @@ UNITREE_A1_CFG = ArticulationCfg(
         },
         joint_vel={".*": 0.0},
     ),
+
     soft_joint_pos_limit_factor=0.9,
+    
     actuators={
         "base_legs": DCMotorCfg(
             joint_names_expr=[".*_hip_joint", ".*_thigh_joint", ".*_calf_joint"],

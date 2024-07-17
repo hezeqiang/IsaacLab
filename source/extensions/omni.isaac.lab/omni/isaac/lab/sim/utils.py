@@ -165,6 +165,7 @@ def apply_nested(func: Callable) -> Callable:
         instanced_prim_paths = []
         # iterate over all prims under prim-path
         all_prims = [prim]
+        
         while len(all_prims) > 0:
             # get current prim
             child_prim = all_prims.pop(0)
@@ -181,6 +182,7 @@ def apply_nested(func: Callable) -> Callable:
                 all_prims += child_prim.GetChildren()
             else:
                 count_success += 1
+
         # check if we were successful in applying the function to any prim
         if count_success == 0:
             carb.log_warn(

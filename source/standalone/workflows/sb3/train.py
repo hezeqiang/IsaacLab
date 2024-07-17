@@ -3,6 +3,10 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+
+#python source/standalone/workflows/sb3/train.py --task Isaac-Cartpole-v0
+#python  source/standalone/workflows/sb3/play.py --task Isaac-Cartpole-v0 --num_envs 32 --checkpoint logs/sb3/isaac-Cartpole-v0/2024-07-16_19-08-46/model.zip
+
 """Script to train RL agent with Stable Baselines3.
 
 Since Stable-Baselines3 does not support buffers living on GPU directly,

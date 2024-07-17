@@ -96,12 +96,17 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, RigidObj
             sim_time = 0.0
             count = 0
             # reset root state
+            # """Root state ``[pos, quat, lin_vel, ang_vel]`` in simulation world frame.
+            # ex: [ 0.2500, -0.2500,  0.0000,  1.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+            # 0.0000,  0.0000,  0.0000,  0.0000,  0.0000]
             root_state = cone_object.data.default_root_state.clone()
             # sample a random position on a cylinder around the origins
             root_state[:, :3] += origins
+            print(root_state)
             root_state[:, :3] += math_utils.sample_cylinder(
                 radius=0.1, h_range=(0.25, 0.5), size=cone_object.num_instances, device=cone_object.device
             )
+
             # write root state to simulation
             cone_object.write_root_state_to_sim(root_state)
             # reset buffers
@@ -131,7 +136,18 @@ def main():
     sim.set_camera_view(eye=[1.5, 0.0, 1.0], target=[0.0, 0.0, 0.0])
     # Design scene
     scene_entities, scene_origins = design_scene()
+    print(scene_entities, scene_origins)
+    #[[ 0.2500,  0.2500,  0.0000],
+    #     [-0.2500,  0.2500,  0.0000],
+    #     [ 0.2500, -0.2500,  0.0000],
+    #     [-0.2500, -0.2500,  0.0000]]
     scene_origins = torch.tensor(scene_origins, device=sim.device)
+    print(scene_origins)
+    # tensor([[ 0.2500,  0.2500,  0.0000],
+    #     [-0.2500,  0.2500,  0.0000],
+    #     [ 0.2500, -0.2500,  0.0000],
+    #     [-0.2500, -0.2500,  0.0000]], device='cuda:0')
+
     # Play the simulator
     sim.reset()
     # Now we are ready!

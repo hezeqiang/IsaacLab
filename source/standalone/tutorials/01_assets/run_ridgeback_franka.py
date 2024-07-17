@@ -20,7 +20,6 @@ import argparse
 from omni.isaac.lab.app import AppLauncher
 
 
-
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Tutorial on spawning and interacting with an articulation.")
 # append AppLauncher cli args
@@ -37,15 +36,15 @@ simulation_app = app_launcher.app
 import torch
 
 import omni.isaac.core.utils.prims as prim_utils
-from get_all_prim_from_World import get_all_prim_from_World
+
 import omni.isaac.lab.sim as sim_utils
 from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.sim import SimulationContext
-
+from get_all_prim_from_World import get_all_prim_from_World
 ##
 # Pre-defined configs
 ##
-from omni.isaac.lab_assets import CARTPOLE_CFG  # isort:skip
+from omni.isaac.lab_assets import RIDGEBACK_FRANKA_PANDA_CFG  # isort:skip
 
 
 def design_scene() -> tuple[dict, list[list[float]]]:
@@ -69,12 +68,12 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     prim_utils.create_prim("/World/Origin2", "Xform", translation=origins[1])
 
     # Articulation
-    cartpole_cfg = CARTPOLE_CFG.copy()
-    cartpole_cfg.prim_path = "/World/Origin.*/Robot"
-    cartpole = Articulation(cfg=cartpole_cfg)
+    FRANKA_PANDA_cfg = RIDGEBACK_FRANKA_PANDA_CFG.copy()
+    FRANKA_PANDA_cfg.prim_path = "/World/Origin.*/Robot"
+    FRANKA_PANDA = Articulation(cfg=FRANKA_PANDA_cfg)
 
     # return the scene information
-    scene_entities = {"cartpole": cartpole}
+    scene_entities = {"FRANKA_PANDA": FRANKA_PANDA}
     return scene_entities, origins
 
 
@@ -83,7 +82,7 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
     # Extract scene entities
     # note: we only do this here for readability. In general, it is better to access the entities directly from
     #   the dictionary. This dictionary is replaced by the InteractiveScene class in the next tutorial.
-    robot = entities["cartpole"]
+    robot = entities["FRANKA_PANDA"]
     # Define simulation stepping
     sim_dt = sim.get_physics_dt()
     count = 0
@@ -106,14 +105,44 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
             joint_pos += torch.rand_like(joint_pos) * 0.1
             robot.write_joint_state_to_sim(joint_pos, joint_vel)
 
-            print("root_state=",root_state,"\n","joint_pos=",joint_vel,"\n","joint_vel=", joint_vel)
+            print("--------------------------------------------------------","\n","root_state=",root_state)
 #           root_state= position, quaternion, velocity, twist
-            # init_state=ArticulationCfg.InitialStateCfg(
-            # pos=(0.0, 0.0, 2.0), joint_pos={"slider_to_cart": 0.0, "cart_to_pole": 0.0}
-            # ),
+#           root_state= tensor([[0.0000, 0.0000, 0.4200, 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+#           0.0000, 0.0000, 0.0000, 0.0000],
+#           [0.0000, 0.0000, 0.4200, 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+#           0.0000, 0.0000, 0.0000, 0.0000]])
+
+            print("--------------------------------------------------------","\n","joint_pos=",joint_pos)
+#  joint_pos= tensor([[-0.5057,  0.0541,  0.0124, -2.8049,  0.0372,  2.0670,  0.0827,  0.7921,
+#           0.0983,  0.0191,  0.1279,  0.0704],
+#         [-0.4942,  0.0297,  0.0113, -2.8037,  0.0655,  2.0857,  0.0274,  0.8078,
+#           0.0535,  0.0527,  0.0941,  0.0631]])
+
+        # joint_pos={
+        #     # base
+        #     "dummy_base_prismatic_y_joint": 0.0,
+        #     "dummy_base_prismatic_x_joint": 0.0,
+        #     "dummy_base_revolute_z_joint": 0.0,
+        #     # franka arm
+        #     "panda_joint1": 0.0,
+        #     "panda_joint2": -0.569,
+        #     "panda_joint3": 0.0,
+        #     "panda_joint4": -2.810,
+        #     "panda_joint5": 0.0,
+        #     "panda_joint6": 2.0,
+        #     "panda_joint7": 0.741,
+        #     # tool
+        #     "panda_finger_joint.*": 0.035,
+        # },
+
+            print("--------------------------------------------------------","\n","joint_vel=",joint_vel)
+
 
             # clear internal buffers
             robot.reset()
+
+            print(robot.joint_names,"\n", "--------------------------------------------------------","\n")
+            print(robot.body_names)
             print("[INFO]: Resetting robot state...")
 
         # Apply random action
@@ -145,6 +174,10 @@ def main():
     sim.reset()
     # Now we are ready!
     print("[INFO]: Setup complete...")
+    
+    # get and print all primes
+    all_prim_list = get_all_prim_from_World()
+
     # Run the simulator
     run_simulator(sim, scene_entities, scene_origins)
 

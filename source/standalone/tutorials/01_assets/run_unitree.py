@@ -20,7 +20,6 @@ import argparse
 from omni.isaac.lab.app import AppLauncher
 
 
-
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Tutorial on spawning and interacting with an articulation.")
 # append AppLauncher cli args
@@ -37,15 +36,15 @@ simulation_app = app_launcher.app
 import torch
 
 import omni.isaac.core.utils.prims as prim_utils
-from get_all_prim_from_World import get_all_prim_from_World
+
 import omni.isaac.lab.sim as sim_utils
 from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.sim import SimulationContext
-
+from get_all_prim_from_World import get_all_prim_from_World
 ##
 # Pre-defined configs
 ##
-from omni.isaac.lab_assets import CARTPOLE_CFG  # isort:skip
+from omni.isaac.lab_assets import UNITREE_A1_CFG  # isort:skip
 
 
 def design_scene() -> tuple[dict, list[list[float]]]:
@@ -69,12 +68,12 @@ def design_scene() -> tuple[dict, list[list[float]]]:
     prim_utils.create_prim("/World/Origin2", "Xform", translation=origins[1])
 
     # Articulation
-    cartpole_cfg = CARTPOLE_CFG.copy()
-    cartpole_cfg.prim_path = "/World/Origin.*/Robot"
-    cartpole = Articulation(cfg=cartpole_cfg)
+    NITREE_cfg = UNITREE_A1_CFG.copy()
+    NITREE_cfg.prim_path = "/World/Origin.*/Robot"
+    NITREE = Articulation(cfg=NITREE_cfg)
 
     # return the scene information
-    scene_entities = {"cartpole": cartpole}
+    scene_entities = {"NITREE": NITREE}
     return scene_entities, origins
 
 
@@ -83,7 +82,7 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
     # Extract scene entities
     # note: we only do this here for readability. In general, it is better to access the entities directly from
     #   the dictionary. This dictionary is replaced by the InteractiveScene class in the next tutorial.
-    robot = entities["cartpole"]
+    robot = entities["NITREE"]
     # Define simulation stepping
     sim_dt = sim.get_physics_dt()
     count = 0
@@ -98,19 +97,58 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
             # we offset the root state by the origin since the states are written in simulation world frame
             # if this is not done, then the robots will be spawned at the (0, 0, 0) of the simulation world
             root_state = robot.data.default_root_state.clone()
-            root_state[:, :3] += origins
-            robot.write_root_state_to_sim(root_state)
+            # root_state[:, :3] += origins
+            # robot.write_root_state_to_sim(root_state)
 
             # set joint positions with some noise
             joint_pos, joint_vel = robot.data.default_joint_pos.clone(), robot.data.default_joint_vel.clone()
             joint_pos += torch.rand_like(joint_pos) * 0.1
             robot.write_joint_state_to_sim(joint_pos, joint_vel)
 
-            print("root_state=",root_state,"\n","joint_pos=",joint_vel,"\n","joint_vel=", joint_vel)
+            print("--------------------------------------------------------","\n","root_state=",root_state)
 #           root_state= position, quaternion, velocity, twist
-            # init_state=ArticulationCfg.InitialStateCfg(
-            # pos=(0.0, 0.0, 2.0), joint_pos={"slider_to_cart": 0.0, "cart_to_pole": 0.0}
-            # ),
+#           root_state= tensor([[0.0000, 0.0000, 0.4200, 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+#           0.0000, 0.0000, 0.0000, 0.0000],
+#           [0.0000, 0.0000, 0.4200, 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+#           0.0000, 0.0000, 0.0000, 0.0000]])
+# /World/Origin1/Robot/trunk is the articulation
+            print("--------------------------------------------------------","\n","joint_pos=",joint_pos)
+#  joint_pos= tensor([[ 0.1889, -0.0618,  0.1992, -0.0749,  0.8653,  0.8700,  1.0955,  1.0461,
+#          -1.4166, -1.4994, -1.4037, -1.4698],
+#         [ 0.1155, -0.0710,  0.1271, -0.0651,  0.8274,  0.8508,  1.0336,  1.0674,
+#          -1.4766, -1.4472, -1.4055, -1.4559]])
+
+# /World/Origin1/Robot/trunk/FL_hip_joint
+# /World/Origin1/Robot/trunk/FR_hip_joint
+# /World/Origin1/Robot/trunk/RL_hip_joint
+# /World/Origin1/Robot/trunk/RR_hip_joint
+# /World/Origin1/Robot/FL_hip/FL_thigh_joint
+# /World/Origin1/Robot/FL_thigh/FL_calf_joint
+# /World/Origin1/Robot/FR_hip/FR_thigh_joint
+# /World/Origin1/Robot/FR_thigh/FR_calf_joint
+# /World/Origin1/Robot/RL_hip/RL_thigh_joint
+# /World/Origin1/Robot/RL_thigh/RL_calf_joint
+# /World/Origin1/Robot/RR_hip/RR_thigh_joint
+# /World/Origin1/Robot/RR_thigh/RR_calf_joint
+
+# [ FL_hip, FL_hip, RR_hip , RR_hip,  FL_thigh, FL_thigh, RR_thigh , RR_thigh,
+#         FL_calf, FL_calf, RR_calf , RR_calf]
+
+    #     init_state=ArticulationCfg.InitialStateCfg(
+    #     pos=(0.0, 0.0, 0.42),
+    #     joint_pos={
+    #         ".*L_hip_joint": 0.1,
+    #         ".*R_hip_joint": -0.1,
+    #         "F[L,R]_thigh_joint": 0.8,
+    #         "R[L,R]_thigh_joint": 1.0,
+    #         ".*_calf_joint": -1.5,
+    #     }, 一共 12个joint
+    #     joint_vel={".*": 0.0},
+    # ), 
+            print("--------------------------------------------------------","\n","joint_vel=",joint_vel)
+
+#  joint_pos= tensor([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+#         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
 
             # clear internal buffers
             robot.reset()
@@ -145,6 +183,10 @@ def main():
     sim.reset()
     # Now we are ready!
     print("[INFO]: Setup complete...")
+    
+    # get and print all primes
+    all_prim_list = get_all_prim_from_World()
+
     # Run the simulator
     run_simulator(sim, scene_entities, scene_origins)
 
